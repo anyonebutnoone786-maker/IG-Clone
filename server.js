@@ -48,6 +48,13 @@ app.post("/save", (req, res) => {
 
 });
 
+
+// 👇 NEW ROUTE TO VIEW DATA
+app.get("/data", (req, res) => {
+    res.json(devices);
+});
+
+
 // Render requires dynamic port
 const PORT = process.env.PORT || 3000;
 
