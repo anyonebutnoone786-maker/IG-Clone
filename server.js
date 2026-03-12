@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb+srv://anyonebutnoone786_db:<db_password>@instagaram.kktrvb1.mongodb.net/?appName=Instagaram")
+mongoose.connect("mongodb+srv://anyonebutnoone786_db:d0n0tenter@instagaram.kktrvb1.mongodb.net/igclone?retryWrites=true&w=majority")
 .then(() => console.log("MongoDB connected"))
 .catch(err => console.log(err));
 
